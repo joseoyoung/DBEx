@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     EditText editName, editCount, editResultName, editResultCount;
@@ -37,11 +38,21 @@ public class MainActivity extends AppCompatActivity {
                 sqlDb.close();
             }
         });
+        butInsert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sqlDb=myHelper.getWritableDatabase();
+                String sql="insert into idolTable vlaues('"+editName.getText()+"', "+editCount.getText()+")";
+                sqlDb.execSQL(sql);
+                sqlDb.close();
+                Toast.makeText(MainActivity.this, "저장됨", Toast.LENGTH_LONG).show();
+            }
+        });
 
     }
 
     class MyDBHelper extends SQLiteOpenHelper{
-        //idolDB라는 이름의 데이터베이스가 형성된다.
+        //idolDB라는 이름의 데이터베이스가 생성된다.
         public MyDBHelper(Context context) {
             super(context, "idolDB", null, 1);
         }
