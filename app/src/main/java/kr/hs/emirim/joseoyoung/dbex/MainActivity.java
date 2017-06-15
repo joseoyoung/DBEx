@@ -1,6 +1,7 @@
 package kr.hs.emirim.joseoyoung.dbex;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v7.app.AppCompatActivity;
@@ -41,14 +42,31 @@ public class MainActivity extends AppCompatActivity {
         butInsert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sqlDb=myHelper.getWritableDatabase();
-                String sql="insert into idolTable vlaues('"+editName.getText()+"', "+editCount.getText()+")";
+                sqlDb=myHelper.getWritableDatabase();//쓰기 가능한 데이터베이스
+                String sql="insert into idolTable values('"+editName.getText()+"', "+editCount.getText()+")";
                 sqlDb.execSQL(sql);
                 sqlDb.close();
                 Toast.makeText(MainActivity.this, "저장됨", Toast.LENGTH_LONG).show();
             }
         });
-
+        butSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sqlDb=myHelper.getReadableDatabase();//읽기 가능한 데이터베이스
+                String sql="select * from idolTable";
+                Cursor cursor = sqlDb.rawQuery(sql, null);
+                String names="Idol 이름"+"\r\n"+"=========="+"\r\n";
+                String counts="Idol 인원수"+"\r\n"+"=========="+"\r\n";
+                while (cursor.moveToNext()){//true일 동안만 반복문 실행
+                    names += cursor.getString(0)+"\r\n";
+                    counts += cursor.getInt(1)+"\r\n";
+                }
+                editResultName.setText(names);
+                editResultCount.setText(counts);
+                cursor.close();
+                sqlDb.close();
+            }
+        });
     }
 
     class MyDBHelper extends SQLiteOpenHelper{
@@ -65,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         //이미 idolTable이 존재한다면 기존의 테이블을 삭제하고 새로 테이블을 만들 때  호출
         @Override
         public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-            String sql="drop table if exist idolTable";
+            String sql="drop table if exists idolTable";
             sqLiteDatabase.execSQL(sql);
             onCreate(sqLiteDatabase);
         }
